@@ -43,7 +43,31 @@ pause()
 #this will check for macchanger and if not installed then DollyeMAC will install it
 checkForDependency()
 {
-    
+    local pkg=macchanger
+
+    echo -e "Checking if someone can deliver your package..."
+    sleep 1
+
+    which $pkg > /dev/null 2>&1
+
+    if [[ $? == 0 ]]
+    then
+        echo -e "Dollye is available..."
+    else
+        echo -e "Dollye is on a delivery. Preparing request for pickup..."
+        sleep 1
+        read -p "Would you like to submit a request (y/n): " input
+        if [[ $input == "y" || $input == "yes" ]]
+        then
+            echo -e "Submitting request for package delivery..."
+            sleep 1
+            sudo apt update && sudo apt upgrade && sudo apt install $pkg
+            echo -e ${ORANGE}"Package is ready for delivery."
+        else
+            sleep 0.5
+            echo -e "Canceling request for pickup as ordered. good day."
+        fi
+    fi 
     pause
 }
 
@@ -106,7 +130,7 @@ DollyeMacMenu()
     echo -e ${GREEN}"::-::-::- ${NT}Welcome to the ${PURPLE}Dollye${ORANGE}MAC ${WHITE}Lobby ${GREEN}-::-::-::"${NT}
     echo -e "1) Check That DollyeMAC Works"
     echo -e "2) Use The Digital Dollye"
-    echo -e "0) Exit"
+    echo -e "0) Exit the lobby"
 }
 
 #this will read user input
