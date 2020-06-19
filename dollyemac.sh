@@ -87,11 +87,11 @@ useDollyeMac()
     echo -e "Checking your wirless adapter..."
     sleep 1
 
-    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${ORANGE}   
+    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${ORANGE}   
     ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:
-    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
+    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
     echo -e ${BLINK}${REDB}${WHITE}${BOLD}"    copy/take note of the letters/numbers above     "${NT}
-    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}
+    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}
     sleep 0.5
 
     read -p $'\e[38;5;208mInsert the wireless adapter you just copied:\e[35m ' userAdapter
