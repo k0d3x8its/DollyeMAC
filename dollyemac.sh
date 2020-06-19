@@ -81,7 +81,7 @@ checkForDependency()
 #this will open DollyeMAC options
 useDollyeMac()
 {
-    userAdapter
+    local userAdapter
     local appleMac
 
     echo -e "Checking your wirless adapter..."
