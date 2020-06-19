@@ -40,6 +40,11 @@ pause()
     read -p $'\e[35mPress [Enter] to return to the lobby...\e[0m'
 }
 
+caution()
+{
+    read -p $'\e[38;5;208mPress [Enter] to continue...\e[0m'
+}
+
 #this will check for macchanger and if not installed then DollyeMAC will install it
 checkForDependency()
 {
@@ -56,11 +61,13 @@ checkForDependency()
     else
         echo -e "Dollye is on a delivery. Preparing request for pickup..."
         sleep 1
+
         read -p "Would you like to submit a request (y/n): " input
         if [[ $input == "y" || $input == "yes" ]]
         then
             echo -e "Submitting request for package delivery..."
             sleep 1
+
             sudo apt update && sudo apt upgrade && sudo apt install $pkg
             echo -e ${ORANGE}"Package is ready for delivery."
         else
@@ -74,7 +81,48 @@ checkForDependency()
 #this will open DollyeMAC options
 useDollyeMac()
 {
+    userAdapter
+    local appleMac
+
+    echo -e "Checking your wirless adapter..."
+    sleep 1
+
+    echo -e                      ${PURPLE}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${ORANGE}   
+    ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:
+    echo -e                      ${PURPLE}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
+    echo -e ${BLINK}${REDB}${WHITE}${BOLD}"    copy/take note of the letters/numbers above     "${NT}
+    echo -e                      ${PURPLE}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}
+    sleep 0.5
+
+    read -p $'\e[38;5;208mInsert the wireless adapter you just copied:\e[35m ' userAdapter
+    sleep 0.5
+    echo -e ${ORANGE}"Go to your Apple TV Settings app. Then go to"
+    echo -e "General/About/Wi-Fi Address and insert the"
+    echo -e "Wi-Fi Address below..."
+    sleep 1
+
+    read -p $'\e[38;5;208mInsert the Apple TV Wi-Fi Address:\e[35m ' appleMac
+    sleep 0.5
+    echo -e ${ORANGE}"Shutting down the wireless interface..."
+    sudo ifconfig $userAdapter down
+    echo -e ${PURPLE}"Waiting for wireless adapter to accept new Wi-Fi Address..."${ORANGE}
+    sleep 10
+
+    sudo macchanger --mac=$appleMac $userAdapter
+    echo -e ${PURPLE}"Waiting for wireless adapter to display wireless interface..."
+    sudo ifconfig $userAdapter up
+    sleep 10
+
+    echo -e ${PURPLE}"Checking new Wi-Fi Address for this PC..."${ORANGE}
+    sleep 1
+    macchanger -s $userAdapter
     pause
+}
+
+#this will return the MAC address to the default address
+changeMacBack()
+{
+   pause
 }
 
 #this will display the choices in a menu format
@@ -127,9 +175,12 @@ DollyeMacMenu()
     echo -e ${GREEN}"             :::     ::   ::   :::   ::: :::"
     echo -e "              :      :     :   : :   :: :: :"${NT}
 
-    echo -e ${GREEN}"::-::-::- ${NT}Welcome to the ${PURPLE}Dollye${ORANGE}MAC ${WHITE}Lobby ${GREEN}-::-::-::"${NT}
+    echo -e ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
+    echo -e ${GREEN}"::-::-::-::- ${WHITE}${BOLD}Welcome to the ${PURPLE}Dollye${ORANGE}MAC ${WHITE}Lobby ${NT}${GREEN}-::-::-::-::"${NT}
+    echo -e ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}    
     echo -e "1) Check That DollyeMAC Works"
     echo -e "2) Use The Digital Dollye"
+    echo -e "3) Return The Digital Dollye"
     echo -e "0) Exit the lobby"
 }
 
@@ -142,6 +193,7 @@ readOptions()
   case $userChoice in
     1) checkForDependency ;;
     2) useDollyeMac ;;
+    3) changeMacBack ;;
     0) exit 0 ;;
     *) echo -e ${BLINK}${REDB}${WHITE}"WARNING${NT}${PURPLE}...You are trying to use the wrong Dollye. ${ORANGE}You will now be escorted by security back to the lobby"${NT} && sleep 6 ;;
   esac
