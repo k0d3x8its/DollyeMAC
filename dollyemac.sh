@@ -14,7 +14,6 @@ SHADBOX='\e[38;5;221m'    #box shade
 DARKBOX='\e[38;5;222m'    #box dark
 WHITE='\e[38;5;15m'       #white
 PURPLE='\e[35m'           #purple
-LITEPURPLE='\e[95m'       #light purple
 TIRE='\e[38;5;238m'       #tires
 GRAVEL='\e[38;5;254m'     #gravel
 GREYGREEN='\e[38;5;151m'  #greyish green
@@ -30,10 +29,6 @@ BOLD='\e[1m'              #bold text
 UL='\e[4m'                #underlined text
 BLINK='\e[5m'             #blink text
 
-########################
-### global variables ###
-########################
-userAdapter
 
 #################
 ### functions ###
