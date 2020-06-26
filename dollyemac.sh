@@ -30,6 +30,11 @@ BOLD='\e[1m'              #bold text
 UL='\e[4m'                #underlined text
 BLINK='\e[5m'             #blink text
 
+########################
+### global variables ###
+########################
+userAdapter
+
 #################
 ### functions ###
 #################
@@ -40,17 +45,13 @@ pause()
     read -p $'\e[35mPress [Enter] to return to the lobby...\e[0m'
 }
 
-caution()
-{
-    read -p $'\e[38;5;208mPress [Enter] to continue...\e[0m'
-}
-
 #this will check for macchanger and if not installed then DollyeMAC will install it
 checkForDependency()
 {
+    local userInput
     local pkg=macchanger
 
-    echo -e "Checking if someone can deliver your package..."
+    echo -e ${ORANGE}"Checking if someone can deliver your package..."
     sleep 1
 
     which $pkg > /dev/null 2>&1
@@ -62,33 +63,47 @@ checkForDependency()
         echo -e "Dollye is on a delivery. Preparing request for pickup..."
         sleep 1
 
-        read -p "Would you like to submit a request (y/n): " input
-        if [[ $input == "y" || $input == "yes" ]]
+        read -p $'Would you like to submit a request (y/n):\e[35m ' userInput
+        if [[ $userInput == "y" || $userInput == "yes" ]]
         then
-            echo -e "Submitting request for package delivery..."
-            sleep 1
+            echo -e ${ORANGE}"Submitting request for package delivery..."
+            sleep 2
 
             sudo apt update && sudo apt upgrade && sudo apt install $pkg
             echo -e ${ORANGE}"Package is ready for delivery."
         else
             sleep 0.5
-            echo -e "Canceling request for pickup as ordered. good day."
+            echo -e ${ORANGE}"Canceling request for pickup. good day."
         fi
     fi 
+
+    sleep 1
     pause
 }
 
 #this will open DollyeMAC options
 useDollyeMac()
 {
-    local userAdapter
     local appleMac
+    local userAdapter
 
-    echo -e "Checking your wirless adapter..."
+    echo -e ${ORANGE}"Checking your wirless adapter..."
     sleep 1
 
-    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${ORANGE}   
+    echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${ORANGE}
+
+    #the command below grabs the wireless adpater and 
+    #displays it for the user. The comments below it are
+    #alternative methods to create the same outcome 
     ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:
+
+    ####################################################
+    ############### Alternative Methods ################
+    ####################################################
+    #ls /sys/class/net | awk 'FNR == 3 {print $1}'
+    #ip link show | awk -F'[:]' 'FNR == 5 {print $2}'
+    ####################################################
+    ####################################################
     echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
     echo -e ${BLINK}${REDB}${WHITE}${BOLD}"     copy/take note of the letters/numbers above        "${NT}
     echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}
@@ -116,13 +131,49 @@ useDollyeMac()
     echo -e ${PURPLE}"Checking new Wi-Fi Address for this PC..."${ORANGE}
     sleep 1
     macchanger -s $userAdapter
+
+    sleep 1
     pause
 }
 
 #this will return the MAC address to the default address
 changeMacBack()
 {
-   pause
+    local modiMac=$(eval ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:)
+    local userInput
+
+    read -p $'\e[38;5;208mReady to turn in your Digital Dollye? (y/n):\e[35m ' userInput
+    
+    if [[ $userInput == "y" || $userInput == "yes" ]]
+    then
+        echo -e ${ORANGE}"Good. let's get started..."
+        sleep 1
+        echo -e "Checking Digital Dollye..."${PURPLE}
+        sleep 1
+        macchanger -s $modiMac
+        sleep 1
+        echo -e ${ORANGE}"Turning in Digital Dollye..."
+        sleep 2
+        echo -e ${ORANGE}"Checking paper work..."${PURPLE}
+        sudo ifconfig $modiMac down
+        sleep 10
+        sudo macchanger -p $modiMac
+        echo -e ${ORANGE}"checking deposit fees..."${PURPLE}
+        sudo ifconfig $modiMac up
+
+        sleep 10
+        echo -e ${ORANGE}"None."
+        sleep 1
+        echo -e "Everything looks good. Thanks for using the Digital Dollye."
+    else
+        echo -e "You can't keep it for ever silly. It will find its way back"
+        echo -e "home after you reboot your system. Once the Digital Dollye"
+        echo -e "has left your PC, then your Wi-Fi Address will return to"
+        echo -e "normal. Good day."
+    fi
+
+    sleep 1
+    pause
 }
 
 #this will display the choices in a menu format
@@ -178,24 +229,24 @@ DollyeMacMenu()
     echo -e ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
     echo -e ${GREEN}"::-::-::-::- ${WHITE}${BOLD}Welcome to the ${PURPLE}Dollye${ORANGE}MAC ${WHITE}Lobby ${NT}${GREEN}-::-::-::-::"${NT}
     echo -e ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"${NT}    
-    echo -e "1) Check That DollyeMAC Works"
-    echo -e "2) Use The Digital Dollye"
-    echo -e "3) Return The Digital Dollye"
-    echo -e "0) Exit the lobby"
+    echo -e ${GREEN}":${PURPLE}1${GREEN}-:: ${ORANGE}Check That DollyeMAC Works${GREEN} ::-::-::-::-::"
+    echo -e ${GREEN}":${PURPLE}2${GREEN}-:: ${ORANGE}Use The Digital Dollye    ${GREEN} ::-::-::-::-::"
+    echo -e ${GREEN}":${PURPLE}3${GREEN}-:: ${ORANGE}Return The Digital Dollye ${GREEN} ::-::-::-::-::_________"
+    echo -e ${GREEN}":${PURPLE}0${GREEN}-:: ${ORANGE}Exit the lobby            ${GREEN} ::-::-::-::-::${UL}  v1.0   ${NT}"
 }
 
 #this will read user input
 readOptions()
 {
   local userChoice
-  read -p $'\e[38;5;208mChoose an option from the lobby ' userChoice
+  read -p $'\e[38;5;208mChoose an option from the lobby:\e[35m ' userChoice
 
   case $userChoice in
     1) checkForDependency ;;
     2) useDollyeMac ;;
     3) changeMacBack ;;
     0) exit 0 ;;
-    *) echo -e ${BLINK}${REDB}${WHITE}"WARNING${NT}${PURPLE}...You are trying to use the wrong Dollye. ${ORANGE}You will now be escorted by security back to the lobby"${NT} && sleep 6 ;;
+    *) echo -e ${BLINK}${REDB}${WHITE}"WARNING${NT}${PURPLE}...You are trying to use the wrong Dollye.\n${ORANGE}You will now be escorted by security back to the lobby"${NT} && sleep 6 ;;
   esac
 }
 
