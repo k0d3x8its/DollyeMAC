@@ -90,13 +90,15 @@ useDollyeMac()
     #the command below grabs the wireless adpater and 
     #displays it for the user. The comments below it are
     #alternative methods to create the same outcome 
-    #ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:
+
+    ip link show | awk -F'[:]' 'FNR == 5 {print $2}'
 
     ####################################################
     ############### Alternative Methods ################
     ####################################################
     #ls /sys/class/net | awk 'FNR == 3 {print $1}'
-    ip link show | awk -F'[:]' 'FNR == 5 {print $2}'
+    #ifconfig | awk 'FNR == 17 {print $1}' | tr -d \:
+
     ####################################################
     ####################################################
     echo -e                      ${GREEN}"::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::-::"
